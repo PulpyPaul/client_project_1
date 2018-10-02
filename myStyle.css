@@ -1,3 +1,20 @@
-﻿body
-{
+﻿body {
+    
 }
+
+form {
+    text-align: center;
+    margin: auto;
+    width: 50%;
+    display: block;
+}
+
+#submitBtn {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+canvas {
+    background-color: #ededed;
+}
+

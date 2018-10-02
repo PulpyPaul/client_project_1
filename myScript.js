@@ -1,70 +1,45 @@
 var selectDiv;
 var choiceData;
 var dataLength;
-
-// Will be moved to a separate file and called through AJAX request
-var choices = {
-  "choices": [
-    {
-      "key": "Main",
-      "option_1": "Ferrari",
-      "option_2": "Lamborghini",
-      "description": "Select a Car Brand",
-      "depth": 0
-    },
-    {
-      "key": "Ferrari",
-      "option_1": "Enzo",
-      "option_2": "Italia",
-      "description": "Select a Ferrari Model",
-      "depth": 1
-    },
-    {
-      "key": "Lamborghini",
-      "option_1": "Aventador",
-      "option_2": "Veneno",
-      "description": "Select a Lamborghini Model",
-      "depth": 1
-    },
-    {
-      "key": "Enzo",
-      "option_1": "Red",
-      "option_2": "Black",
-      "description": "Select an Enzo Color",
-      "depth": 2
-    },
-    {
-      "key": "Italia",
-      "option_1": "Blue",
-      "option_2": "Pink",
-      "description": "Select an Italia Color",
-      "depth": 2
-    },
-    {
-      "key": "Aventador",
-      "option_1": "Green",
-      "option_2": "Purple",
-      "description": "Select an Aventador Color",
-      "depth": 2
-    },
-    {
-      "key": "Veneno",
-      "option_1": "Orange",
-      "option_2": "Grey",
-      "description": "Select a Veneno Color",
-      "depth": 2
-    }
-  ]
-}
+var canvas;
+var ctx;
+var submitBtn;
+var firstNameInput;
+var lastNameInput;
+var profileInfo;
+var images;
 
 function init() {
-   currentKeys = [];
-   choiceData = choices.choices;
-   selectDiv = document.getElementById('selectDiv');
-   dataLength = Object.keys(choiceData).length;
-   createSelectElement('Main');
+    choiceData = choices.choices;
+    selectDiv = document.getElementById('selectDiv');
+    dataLength = Object.keys(choiceData).length;
+    createSelectElement('Main');
+    submitBtn = document.getElementById('submitBtn');
+    firstNameInput = document.getElementById('firstName');
+    lastNameInput = document.getElementById('lastName');
+    profileInfo = document.getElementById('profileInfo');
+    submitBtn.onclick = validateData;
+    images = [];
+    createImages();
+        
+    canvas = document.getElementById('myCanvas');
+    ctx = canvas.getContext('2d');
+    ctx.font = "100px Arial";
 };
 
+function createImages() {
+    for (var i = 0; i < 10; i++) {
+        var img = new Image();
+        images.push(img);
+    }
+    
+    images[0].src = "img/ferrari_logo.png";
+    images[1].src = "img/lamborghini_logo.png";
+    //images[2] = "img/ferarri"
+    
+};
+
+// Creates
 function createSelectElement(dataKey){
     
     for (var i = 0; i < dataLength; i++) {
@@ -106,14 +81,16 @@ function createSelectElement(dataKey){
         newOption2.text = choiceData[i].option_2;
         selectList.appendChild(newOption2);
         
+        // Hooks up an event to reload the choices whenever the select value is changed
         selectList.onchange = reloadSelect;
     }
 };
 
-// Re-creates the selected based on previous choice
+// Re-creates the select elements based on previous choice
 function reloadSelect() {
     removeElements(this.className);
     createSelectElement(this.value);
+    updateCanvas(this);
 };
 
 // Removes all child elements from the select div
@@ -125,19 +102,63 @@ function clearSelect(){
     }
 };
 
+// Removes elements based on the depth of the question
 function removeElements(elementDepth){
     
+    // gets the current depth from the parameter
     var currentDepth = parseInt(elementDepth);
-        
+    
+    // Loops through any elements that have a depth deeper than the previously changed select option
     for (var i = 2; i > currentDepth; i--){
+        
+        // Gets all elements of a given depth
         var elementsToDelete = document.getElementsByClassName(i);
+        
+        // Deletes all elements that are the targeted depth
         while(elementsToDelete.length > 0){
             elementsToDelete[0].parentNode.removeChild(elementsToDelete[0]);
         }
     }
-    
-    
 };
 
+function validateData() {
+    if (firstNameInput.value != "" && lastNameInput.value != ""){
+        localStorage.setItem(lastNameInput.value, firstNameInput.value);
+        updateProfile();
+    } else {
+        alert("Please fill out both fields");
+    }
+};
+
+function updateProfile() {
+    var profile = document.createElement('h3');
+    var textNode = document.createTextNode("Current User: " + lastNameInput.value + " " + firstNameInput.value);
+    profile.appendChild(textNode);
+    profileInfo.appendChild(profile);    
+    console.dir(localStorage);
+};
+
+
+function createCookie(name, data, daysToLive) {
+    var cookie = name + "=" + encodeURIComponent(data);
+    if (typeof daysToLive === "number") {
+        cookie += "; max-age=" + (daysToLive*60*60*24);
+    }
+    document.cookie = cookie;
+};
+
+function updateCanvas(element) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    switch(element.value) {
+        case "Ferrari":
+            ctx.drawImage(images[0], canvas.width / 2 - images[0].width / 2, canvas.height / 2 - images[0].height / 2);
+            break;
+        case "Lamborghini":
+            ctx.drawImage(images[1], canvas.width / 2 - images[0].width / 2, canvas.height / 2 - images[0].height / 2);
+        default:
+            break;
+    }
+};
 
 window.onload = init;
