@@ -8,6 +8,9 @@ var firstNameInput;
 var lastNameInput;
 var profileInfo;
 var images;
+var carImg;
+var savedData;
+var clearStorageBtn;
 
 function init() {
     choiceData = choices.choices;
@@ -17,26 +20,54 @@ function init() {
     submitBtn = document.getElementById('submitBtn');
     firstNameInput = document.getElementById('firstName');
     lastNameInput = document.getElementById('lastName');
-    profileInfo = document.getElementById('profileInfo');
+    savedData = document.getElementById('savedData');
+    clearStorageBtn = document.getElementById('clearStorageBtn');
+    clearStorageBtn.onclick = clearLocalStorage;
     submitBtn.onclick = validateData;
     images = [];
     createImages();
-        
+    
+    if (localStorage.length != 0)
+        displaySavedProfiles();
+    
     canvas = document.getElementById('myCanvas');
     ctx = canvas.getContext('2d');
     ctx.font = "100px Arial";
 };
 
+// Creates an array of images
 function createImages() {
     for (var i = 0; i < 10; i++) {
+        
+        // Create new image
         var img = new Image();
+        
+        // Add image to array
         images.push(img);
+        
+        // Give image a source from the imageData array in imageData.js
+        images[i].src = imgPaths[i];
     }
+};
+
+// Removes all child nodes from saved data
+function clearSavedData() {
     
-    images[0].src = "img/ferrari_logo.png";
-    images[1].src = "img/lamborghini_logo.png";
-    //images[2] = "img/ferarri"
+    // While saved data contains a first child node
+    while(savedData.firstChild){
+        
+        // Remove that first child node
+        savedData.removeChild(savedData.firstChild);
+    }
+};
+
+
+// Clears localstorage
+function clearLocalStorage() {
+    localStorage.clear();
     
+    // Removes text of any saved items
+    clearSavedData();
 };
 
 // Creates
@@ -121,43 +152,144 @@ function removeElements(elementDepth){
     }
 };
 
+// Saves data to local storage
+function saveData(){
+    
+    // array used to hold the data
+    var data = [];
+    
+    // adds first and last name values to the array
+    data.push(firstNameInput.value);
+    data.push(lastNameInput.value);
+    
+    // loops through all elements that have a depth in their classname
+    for (var i = 0; i < 3; i++){
+        
+        // gets the list of elements
+        var depthElements = document.getElementsByClassName(i.toString());
+        
+        // adds the select element value to the data array
+        data.push(depthElements[1].value);
+    }
+    
+    // stores the item with the last name as a key in local storage
+    localStorage.setItem(lastNameInput.value, JSON.stringify(data));
+};
+
+// Validates data before it is saved to local storage
 function validateData() {
+    
+    // Checks for both name fields being filled out
     if (firstNameInput.value != "" && lastNameInput.value != ""){
-        localStorage.setItem(lastNameInput.value, firstNameInput.value);
-        updateProfile();
+        
+        // Gets all elements of a 2 depth by classname
+        var depth2Elements = document.getElementsByClassName("2");
+        
+        // Loops through the elements to check if all select elements were filled out and a value was selected
+        for (var i = 0; i < depth2Elements.length; i++){
+            
+            // if all select elements are filled out, save the data to local storage
+            if (depth2Elements[i].tagName === 'SELECT' && depth2Elements[i].value != "Select an Option"){
+                saveData();
+                displaySavedProfiles();
+                return;
+            }
+        }
+        alert("Please fill out all select fields");
+        
     } else {
-        alert("Please fill out both fields");
+        alert("Please fill out both name fields");
     }
 };
 
-function updateProfile() {
-    var profile = document.createElement('h3');
-    var textNode = document.createTextNode("Current User: " + lastNameInput.value + " " + firstNameInput.value);
-    profile.appendChild(textNode);
-    profileInfo.appendChild(profile);    
-    console.dir(localStorage);
-};
-
-
-function createCookie(name, data, daysToLive) {
-    var cookie = name + "=" + encodeURIComponent(data);
-    if (typeof daysToLive === "number") {
-        cookie += "; max-age=" + (daysToLive*60*60*24);
-    }
-    document.cookie = cookie;
-};
-
+// Updates the canvas based on a given elements value
 function updateCanvas(element) {
+    
+    // Clears the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Draws an image to the canvas based on the element's value
     switch(element.value) {
         case "Ferrari":
             ctx.drawImage(images[0], canvas.width / 2 - images[0].width / 2, canvas.height / 2 - images[0].height / 2);
             break;
         case "Lamborghini":
-            ctx.drawImage(images[1], canvas.width / 2 - images[0].width / 2, canvas.height / 2 - images[0].height / 2);
+            ctx.drawImage(images[1], canvas.width / 2 - images[1].width / 2, canvas.height / 2 - images[1].height / 2);
+            break;
+        case "Enzo":
+            ctx.drawImage(images[4], canvas.width / 2 - images[4].width / 2, canvas.height / 2 - images[4].height / 2);
+            break;
+        case "Italia":
+            ctx.drawImage(images[2], canvas.width / 2 - images[2].width / 2, canvas.height / 2 - images[2].height / 2);
+            break;
+        case "Aventador":
+            ctx.drawImage(images[9], canvas.width / 2 - images[9].width / 2, canvas.height / 2 - images[9].height / 2);
+            break;
+        case "Veneno":
+            ctx.drawImage(images[7], canvas.width / 2 - images[7].width / 2, canvas.height / 2 - images[7].height / 2);
+            break;
+        case "Red":
+            ctx.drawImage(images[4], canvas.width / 2 - images[4].width / 2, canvas.height / 2 - images[4].height / 2);
+            break;
+        case "Black":
+            ctx.drawImage(images[5], canvas.width / 2 - images[5].width / 2, canvas.height / 2 - images[5].height / 2);
+            break;
+        case "Blue":
+            ctx.drawImage(images[3], canvas.width / 2 - images[3].width / 2, canvas.height / 2 - images[3].height / 2);
+            break;
+        case "Pink":
+            ctx.drawImage(images[2], canvas.width / 2 - images[2].width / 2, canvas.height / 2 - images[2].height / 2);
+            break;
+        case "Green":
+            ctx.drawImage(images[8], canvas.width / 2 - images[8].width / 2, canvas.height / 2 - images[8].height / 2);
+            break;
+        case "Purple":
+            ctx.drawImage(images[9], canvas.width / 2 - images[9].width / 2, canvas.height / 2 - images[9].height / 2);
+            break;
+        case "Orange":
+            ctx.drawImage(images[6], canvas.width / 2 - images[6].width / 2, canvas.height / 2 - images[6].height / 2);
+            break;
+        case "Grey":
+            ctx.drawImage(images[7], canvas.width / 2 - images[7].width / 2, canvas.height / 2 - images[7].height / 2);
+            break;
         default:
             break;
+    }
+};
+
+// Dynamically creates text to display saved data in local storage
+function displaySavedProfiles() {
+    
+    // Clears the previous text
+    clearSavedData();
+    
+    // Creates a header node to represent the saved data
+    var headerNode = document.createElement('h3');
+    var textNode = document.createTextNode("Saved Data Profiles");
+    headerNode.appendChild(textNode);
+    savedData.appendChild(headerNode);
+    
+    // Loops through all objects in local storage
+    for (var i = 0; i < localStorage.length; i++){
+        
+        // Parses the local storage content into an array of string
+        var stringArray = JSON.parse(localStorage.getItem(localStorage.key(i)));
+        
+        // Loops through all string objects within each data piece in local storage
+        for (var j = 0; j < stringArray.length; j++){
+            
+            // Creates a paragraph item for each string in the array
+            var dataItem = document.createElement('p');
+            var dataTextNode = document.createTextNode(stringArray[j]);
+            dataItem.appendChild(dataTextNode);
+            savedData.appendChild(dataItem);
+        }
+        
+        // Creates a divider to separate different items in local storage
+        var divider = document.createElement('p');
+        var dividerText = document.createTextNode("-------------");
+        divider.appendChild(dividerText);
+        savedData.appendChild(divider);
     }
 };
 
