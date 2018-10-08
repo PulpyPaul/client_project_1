@@ -10,22 +10,16 @@
     <link rel="stylesheet" href="myStyle.css">
 </head>
 <body>
-    <div>
-        <form id="nameForm">
-            <h4>Enter your First Name:</h4>
-            <input type="text" name="firstName" id="firstName">
-            <h4>Enter your Last Name:</h4>
-            <input type="text" name="lastName" id="lastName"><br>
-            <button id="submitBtn" type="button">Submit</button>
-        </form>
-    </div>
-    <div id="selectDiv">
-    </div>
-    <div>
-        <h3>Current Selection Output</h3>
-        <canvas id="myCanvas" height="400" width="600"></canvas>
-    </div>
-    <button id="clearStorageBtn">Clear Local Storage</button>
+    <form id="nameForm">
+        <h4>Enter your First Name:</h4>
+        <input type="text" name="firstName" id="firstName">
+        <h4>Enter your Last Name:</h4>
+        <input type="text" name="lastName" id="lastName"><br>
+        <button id="submitBtn" type="button">Submit</button>
+    </form>
+    <div id="selectDiv"></div>
+    <canvas id="myCanvas" height="400" width="600"></canvas>
+    <button id="clearStorageBtn">Clear Local Storage and Cookies</button>
     <div id="savedData"></div>
 </body>
 </html>

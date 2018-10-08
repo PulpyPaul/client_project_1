@@ -13,6 +13,12 @@ var savedData;
 var clearStorageBtn;
 
 function init() {
+    
+    if (!checkValidBrowser()) {
+        window.location.href = "newBrowser.html";
+        return;
+    }
+        
     choiceData = choices.choices;
     selectDiv = document.getElementById('selectDiv');
     dataLength = Object.keys(choiceData).length;
@@ -27,9 +33,11 @@ function init() {
     images = [];
     createImages();
     
-    if (localStorage.length != 0)
+    if (window.localStorage){
+        if (localStorage.length != 0)
         displaySavedProfiles();
-    
+    }
+        
     canvas = document.getElementById('myCanvas');
     ctx = canvas.getContext('2d');
     ctx.font = "100px Arial";
@@ -172,6 +180,11 @@ function saveData(){
         data.push(depthElements[1].value);
     }
     
+    // If cookies are enabled, create a cookie based on the data
+    if (navigator.cookieEnabled) {
+        document.cookie = JSON.stringify(data);
+    } 
+    
     // stores the item with the last name as a key in local storage
     localStorage.setItem(lastNameInput.value, JSON.stringify(data));
 };
@@ -265,7 +278,7 @@ function displaySavedProfiles() {
     
     // Creates a header node to represent the saved data
     var headerNode = document.createElement('h3');
-    var textNode = document.createTextNode("Saved Data Profiles");
+    var textNode = document.createTextNode("Saved Data Profiles Local Storage");
     headerNode.appendChild(textNode);
     savedData.appendChild(headerNode);
     
@@ -290,6 +303,48 @@ function displaySavedProfiles() {
         var dividerText = document.createTextNode("-------------");
         divider.appendChild(dividerText);
         savedData.appendChild(divider);
+    }
+    
+    // If there are any cookies, display them dynamically below the local storage data
+    if (document.cookie){
+        
+        // Creates a paragraph item for the cookies
+        var cookieHeader = document.createElement('h3');
+        var cookieHeaderText = document.createTextNode("Saved Data Profiles Cookies");
+        cookieHeader.appendChild(cookieHeaderText);
+        savedData.appendChild(cookieHeader);
+        
+        // Creates a paragraph item for the cookies
+        var cookieDataItem = document.createElement('p');
+        var cookieDataTextNode = document.createTextNode(document.cookie);
+        cookieDataItem.appendChild(cookieDataTextNode);
+        savedData.appendChild(cookieDataItem);
+    }
+};
+
+// Used to check if the user has valid browser
+function checkValidBrowser() {
+    
+    // Assigns the user agent object
+    var sUsrAg = navigator.userAgent;
+    
+    // Returns true if the browser is valid, false if it is invalid
+    if (sUsrAg.indexOf("Firefox") > -1) {
+        return true;
+    } else if (sUsrAg.indexOf("Opera") > -1) {
+        return false;
+    } else if (sUsrAg.indexOf("Trident") > -1) {
+        return false;
+    } else if (sUsrAg.indexOf("Edge") > -1) {
+        return false;
+    } else if (sUsrAg.indexOf("Chrome") > -1) {
+        return true;
+    } else if (sUsrAg.indexOf("Safari") > -1) {
+        return false;
+    } else if (sUsrAg.indexOf("MSIE") > -1) {
+        return false;
+    } else {
+        return true;
     }
 };
 
