@@ -1,0 +1,25 @@
+--------------------- DHTML Work ---------------------
+
+For my DHTML I added dynamic content for displaying the cookies and local storage. I created a button that
+clears the current local storage and cookies as well as clearing this displayed content on the screen. There
+is also a "Submit" button that saves this local data / cookies and will dynamically create content based on this
+saved to the screen. In terms of validation for submitting data, I required all fields to be filled out. The first
+and last name of the user as well as all select fields must be completed for the process to be completed. Otherwise,
+an alert will be posted to the screen telling the user what they are missing.
+
+--------------------- Above and Beyond -------------------
+
+For my above and beyond, I wanted to explore the HTML5 Canvas element. There is a lot of cool examples of animations
+that i've seen done with this element, so I decided to add my own to this project. Everytime a user changes their choices
+in the select elements, an image will be rendered to the canvas to reflect this choice. I also added a cool bouncing bubble
+animation to the canvas that changes color based on the current selection value. I added collision detection to the walls of
+the canvas to make the bubbles bounce around within a confined space above the image layer. All of the colors are properly synced
+based on the users choice. Learning the canvas took a lot of time and I think the animations I added dynamically are pretty cool
+and go well with the theme of the dynamic content of the project.
+
+On top of the canvas element, I also tried to give this application the ability to scale really well. I created a "depth" system
+in my data file to allow another developer to create new choices as well as more depth of choices. Essentially the first choice
+starts at a "depth" of 0, the next choice is a "depth" of 1, etc. The depth of the choices is what determines how they are dynamically
+created, because the function I used to create the select elements is dependent on this value. Once a user changes the "depth" property
+in the JSON file and adds more choices, it would detect this in the code. Every select element is hooked to an onchange event that sends
+its depth to another function, essentially allowing a generic module of any depth to be created with minimal changes to the code.

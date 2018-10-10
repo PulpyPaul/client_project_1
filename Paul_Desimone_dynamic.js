@@ -476,7 +476,7 @@ function checkValidBrowser() {
     } else if (sUsrAg.indexOf("MSIE") > -1) {
         return false;
     } else {
-        return true;
+        return false;
     }
 };
 
