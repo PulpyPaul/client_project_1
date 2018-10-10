@@ -1,46 +1,162 @@
-var selectDiv;
-var choiceData;
-var dataLength;
-var canvas;
-var ctx;
-var submitBtn;
-var firstNameInput;
-var lastNameInput;
-var profileInfo;
-var images;
-var carImg;
-var savedData;
-var clearStorageBtn;
+var selectDiv;      // div element which contains all dynamically created select elements
+var choiceData;     // JSON of all possible choices
+var dataLength;     // length of the objects in the JSON data for choices
+var canvas;         // canvas element
+var ctx;            // 2D context of the canvas element
+var submitBtn;      // Button used to submit data
+var firstNameInput; // holds input field of users first name
+var lastNameInput;  // holds input field of users last name
+var images;         // array of image objects
+var savedData;      // div element that contains cookie and local storage data
+var clearStorageBtn;// button used to clear cookie and local storage data
+var recentSelection;// element containing the most recent selected value
+var circles;        // array of circle objects
 
+// Initializes many variables, called when window loads
 function init() {
     
+    // Checks for a valid browser, if it is not valid redirects to new browser page
     if (!checkValidBrowser()) {
-        window.location.href = "newBrowser.html";
+        window.location.href = "Paul_Desimone_newBrowser.html";
         return;
     }
         
+    // Gets JSON data from choiceData.js
     choiceData = choices.choices;
-    selectDiv = document.getElementById('selectDiv');
+    
+    // Gets the length of data from the JSON object
     dataLength = Object.keys(choiceData).length;
-    createSelectElement('Main');
+    
+    // Element assignments by ID
+    selectDiv = document.getElementById('selectDiv');
     submitBtn = document.getElementById('submitBtn');
     firstNameInput = document.getElementById('firstName');
     lastNameInput = document.getElementById('lastName');
     savedData = document.getElementById('savedData');
     clearStorageBtn = document.getElementById('clearStorageBtn');
+    
+    // Onclick event initializations
     clearStorageBtn.onclick = clearLocalStorage;
     submitBtn.onclick = validateData;
+    
+    // Initializes images array
     images = [];
+    
+    // Creates the images
     createImages();
     
-    if (window.localStorage){
+    // Creates the first select element
+    createSelectElement('Main');
+    
+    // If local storage or cookies contain any data, display it    
+    if (window.localStorage || document.cookie){
         if (localStorage.length != 0)
         displaySavedProfiles();
     }
         
+    // Gets reference to the canvas and its 2D context
     canvas = document.getElementById('myCanvas');
     ctx = canvas.getContext('2d');
-    ctx.font = "100px Arial";
+    
+    // Intializes circles array and creates them
+    circles = [];
+    createCircles();
+    
+    // Sets default color to grey
+    ctx.fillStyle = "rgba(125, 125, 125, 0.4)";
+    
+    // Draws circles to the canvas
+    drawCircles();
+    
+    // Starts animating the circles
+    requestAnimationFrame(update);
+    
+};
+
+// Function constructor used to create new circles
+function Circle() {
+    this.radius = 20;
+    this.x = getRandomInt(20, canvas.width - 20),
+    this.y = getRandomInt(20, canvas.height - 20),
+    this.velocityX = 1,
+    this.velocityY = 1,
+    this.speed = 2
+};
+
+// Updates position values for each circle
+function update() {
+    
+    // Loops through the circle array
+    for (var i = 0; i < circles.length; i++) {
+        
+        // Updates x and y positions based on circle velocity and speed
+        circles[i].x += circles[i].velocityX * circles[i].speed;
+        circles[i].y += circles[i].velocityY * circles[i].speed;
+        
+        // If a circle touches the x axis, reverse its x velocity
+        if (circles[i].x > canvas.width - circles[i].radius || circles[i].x < circles[i].radius) {
+            circles[i].velocityX *= -1;
+        }
+        
+        // If a circle touches the y axis, reverse its y velocity
+        if (circles[i].y > canvas.height - circles[i].radius || circles[i].y < circles[i].radius) {
+            circles[i].velocityY *= -1;
+        }
+    }
+    
+    // Draws circles to the screen
+    drawCircles();
+    
+    // Recursive call for animation
+    requestAnimationFrame(update);
+};
+
+// Creates 20 circle objects and adds them to an array
+function createCircles() {
+    
+    // Loops 20 times to create 20 circles
+    for (var i = 0; i < 20; i++) {
+        
+        // Creates a new circle object
+        var circle = new Circle();
+        
+        // Randomly picks a velocityX, either 1 or -1
+        if ((Math.floor(Math.random() * 2)) == 1) {
+            circle.velocityX *= -1;
+        }
+        
+        // Randomly picks a velocityY, either 1 or -1
+        if ((Math.floor(Math.random() * 2)) == 1) {
+            circle.velocityY *= -1;
+        }
+        
+        // Adds circle to array of circles
+        circles.push(circle);
+    }
+}
+
+// Gets a random integer between a a given min and max --- BOTH VALUES ARE INCLUSIVE
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
+};
+
+// Renders the circles to the canvas
+function drawCircles() {
+    
+    // Clears the canvas of any previous drawings from the last frame
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Checks if the recent selection, if not, updates the images and circle color
+    if (recentSelection != null) {
+        updateImages(recentSelection);    
+    }
+    
+    // Draws circles to the canvas based on their properties
+    for (var i = 0; i < circles.length; i++) {
+        ctx.beginPath();
+        ctx.arc(circles[i].x, circles[i].y, circles[i].radius, 0, 2 * Math.PI);
+        ctx.fill();
+    }
 };
 
 // Creates an array of images
@@ -69,7 +185,6 @@ function clearSavedData() {
     }
 };
 
-
 // Clears localstorage
 function clearLocalStorage() {
     localStorage.clear();
@@ -78,7 +193,7 @@ function clearLocalStorage() {
     clearSavedData();
 };
 
-// Creates
+// Dynamically creates select elements based on a key
 function createSelectElement(dataKey){
     
     for (var i = 0; i < dataLength; i++) {
@@ -127,9 +242,15 @@ function createSelectElement(dataKey){
 
 // Re-creates the select elements based on previous choice
 function reloadSelect() {
+    
+    // removes any elements if necessary
     removeElements(this.className);
+    
+    // creates new select elements
     createSelectElement(this.value);
-    updateCanvas(this);
+    
+    // assigns the most recent selection value
+    recentSelection = this;
 };
 
 // Removes all child elements from the select div
@@ -216,54 +337,65 @@ function validateData() {
 };
 
 // Updates the canvas based on a given elements value
-function updateCanvas(element) {
+function updateImages(element) {
     
-    // Clears the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draws an image to the canvas based on the element's value
+    // Draws an image to the canvas based on the element's value and changes the color of the circles
     switch(element.value) {
         case "Ferrari":
+            ctx.fillStyle = "rgb(255, 255, 0, 0.4)";
             ctx.drawImage(images[0], canvas.width / 2 - images[0].width / 2, canvas.height / 2 - images[0].height / 2);
             break;
         case "Lamborghini":
             ctx.drawImage(images[1], canvas.width / 2 - images[1].width / 2, canvas.height / 2 - images[1].height / 2);
+            ctx.fillStyle = "rgb(0, 0, 0, 0.4)";
             break;
         case "Enzo":
             ctx.drawImage(images[4], canvas.width / 2 - images[4].width / 2, canvas.height / 2 - images[4].height / 2);
+            ctx.fillStyle = "rgb(255, 0, 0, 0.4)";
             break;
         case "Italia":
             ctx.drawImage(images[2], canvas.width / 2 - images[2].width / 2, canvas.height / 2 - images[2].height / 2);
+            ctx.fillStyle = "rgb(204, 0, 153, 0.4)";
             break;
         case "Aventador":
             ctx.drawImage(images[9], canvas.width / 2 - images[9].width / 2, canvas.height / 2 - images[9].height / 2);
+            ctx.fillStyle = "rgb(153, 0, 153, 0.4)";
             break;
         case "Veneno":
             ctx.drawImage(images[7], canvas.width / 2 - images[7].width / 2, canvas.height / 2 - images[7].height / 2);
+            ctx.fillStyle = "rgb(217, 217, 217, 0.4)";
             break;
         case "Red":
             ctx.drawImage(images[4], canvas.width / 2 - images[4].width / 2, canvas.height / 2 - images[4].height / 2);
+            ctx.fillStyle = "rgb(255, 0, 0, 0.4)";
             break;
         case "Black":
             ctx.drawImage(images[5], canvas.width / 2 - images[5].width / 2, canvas.height / 2 - images[5].height / 2);
+            ctx.fillStyle = "rgb(0, 0, 0, 0.4)";
             break;
         case "Blue":
             ctx.drawImage(images[3], canvas.width / 2 - images[3].width / 2, canvas.height / 2 - images[3].height / 2);
+            ctx.fillStyle = "rgb(0, 153, 255, 0.4)";
             break;
         case "Pink":
             ctx.drawImage(images[2], canvas.width / 2 - images[2].width / 2, canvas.height / 2 - images[2].height / 2);
+            ctx.fillStyle = "rgb(204, 0, 153, 0.4)";
             break;
         case "Green":
             ctx.drawImage(images[8], canvas.width / 2 - images[8].width / 2, canvas.height / 2 - images[8].height / 2);
+            ctx.fillStyle = "rgb(170, 255, 128, 0.4)";
             break;
         case "Purple":
             ctx.drawImage(images[9], canvas.width / 2 - images[9].width / 2, canvas.height / 2 - images[9].height / 2);
+            ctx.fillStyle = "rgb(153, 0, 153, 0.4)";
             break;
         case "Orange":
             ctx.drawImage(images[6], canvas.width / 2 - images[6].width / 2, canvas.height / 2 - images[6].height / 2);
+            ctx.fillStyle = "rgb(255, 153, 102, 0.4)";
             break;
         case "Grey":
             ctx.drawImage(images[7], canvas.width / 2 - images[7].width / 2, canvas.height / 2 - images[7].height / 2);
+            ctx.fillStyle = "rgb(217, 217, 217, 0.4)";
             break;
         default:
             break;

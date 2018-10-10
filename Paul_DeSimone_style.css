@@ -1,0 +1,21 @@
+﻿html {
+    background-color: darkgray;
+    font-family: Arial;
+}
+
+body {
+    text-align: center;
+    margin: auto;
+    width: 50%;
+    display: block;
+}
+
+#submitBtn {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#clearStorageBtn {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
